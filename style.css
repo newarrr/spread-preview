@@ -1,0 +1,260 @@
+:root{--bg:#07101a;--card:#0c1622;--card2:#0e1a27;--line:#1f3245;--line2:#2a4157;--ink:#f2f6fa;--muted:#8fa3b6;--teal:#16e2cc;--coral:#ff6870;--green:#3ccf7a;--gold:#f4c450;--blue:#5b8def}
+*{box-sizing:border-box}
+/* An element marked hidden stays hidden even when its class gives it a display (grid/flex); found 0.5.3: the empty lines showed. */
+[hidden]{display:none!important}
+html,body{height:100%}
+/* Step 7 (0.8.0, ARCHITECTURE.md section 19): the wide layout from the user's picture; everything on one screen (decision 13).
+   Decision 10 stays: the card IS the window. The chart takes whatever height is left. */
+body{margin:0;color:var(--ink);font-family:"Segoe UI",Tahoma,Arial,sans-serif;overflow:auto;
+  background:radial-gradient(ellipse 38% 34% at 0% 0%,rgba(22,226,204,.13),transparent 70%),radial-gradient(ellipse 34% 30% at 100% 0%,rgba(91,141,239,.16),transparent 70%),var(--bg)}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+.ic .solid{fill:currentColor}.ic .thick{stroke-width:3.2}
+.ic.teal{color:var(--teal)}.ic.coral{color:var(--coral)}.ic.blue{color:var(--blue)}.ic.muted{color:var(--muted)}.ic.gold{color:var(--gold)}
+.card{position:relative;min-height:100vh;width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 22px 6px;text-align:center}
+.card>*{width:100%}
+.num,.spread,.tile>bdi,.stat bdi,.session-sum{font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-variant-numeric:tabular-nums;direction:ltr}
+
+/* The two symbols at the top (the title line was removed in 0.8.1) */
+/* With the signal; in the top-left corner on a wide screen (0.8.4, see the end of the file) */
+.card>.head{display:flex;align-items:center;justify-content:center;gap:14px}
+.pair{font-size:14px;color:var(--muted);direction:ltr}
+.pair bdi{font-family:Consolas,"Courier New",monospace}
+bdi{unicode-bidi:isolate}
+
+/* «الرقم الكبير» in a frame that glows in the number's colour */
+.hero{--glow:var(--line2);position:relative;max-width:820px;margin-top:10px;padding:12px 20px 3px;border:1.5px solid var(--glow);border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--card);box-shadow:0 0 22px -6px var(--glow),inset 0 0 26px -14px var(--glow);transition:border-color .25s,box-shadow .25s}
+.hero:has(.spread.up){--glow:rgba(22,226,204,.75)}
+.hero:has(.spread.down){--glow:rgba(255,104,112,.75)}
+.label{position:absolute;top:-13px;left:50%;transform:translateX(-50%);padding:2px 22px;font-size:15px;font-weight:700;color:var(--ink);white-space:nowrap;
+  background:var(--card2);border:1px solid var(--glow);border-radius:999px}
+.spread{font-weight:800;font-size:clamp(40px,min(9vw,8.4vh),96px);line-height:1.1;transition:color .25s;user-select:all}
+.spread.up{color:var(--teal)}.spread.down{color:var(--coral)}
+
+/* «التاريخان»: one bar */
+.start{max-width:1100px;padding:6px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(12,22,34,.8)}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.date-field{display:flex;align-items:center;justify-content:center;gap:12px;min-width:0}
+.date-field+.date-field{border-inline-start:1px solid var(--line)}
+.start-label{font-size:14px;color:var(--muted);white-space:nowrap}
+.start-label small{font-size:12px;opacity:.85}
+.start-row{display:flex;gap:6px;align-items:center;min-width:0}
+.start input{min-width:0;width:240px;background:#0a131e;color:var(--ink);border:1px solid var(--line2);border-radius:10px;padding:6px 10px;font-size:14px;font-family:"Segoe UI",Tahoma,sans-serif;font-weight:600;direction:ltr;color-scheme:dark}
+.start input:focus{outline:2px solid var(--teal);outline-offset:1px}
+.start button{background:transparent;color:var(--muted);border:1px solid var(--line2);border-radius:9px;padding:3px 9px;font-size:16px;line-height:1;cursor:pointer;flex:none}
+.start button:hover{color:var(--ink);border-color:var(--muted)}
+
+/* «الشراء والبيع»: the entry spread for «زيادة» and «نقصان», and the cost (step 8); in the top-right corner on a wide screen */
+.entry{max-width:560px;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:5px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(12,22,34,.8);text-align:start}
+.entry-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;cursor:default}
+.entry-name{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700}
+.entry-legs{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.entry-row>bdi{font-family:"Segoe UI",Tahoma,sans-serif;font-variant-numeric:tabular-nums;font-size:19px;font-weight:700;direction:ltr}
+.entry-row.up>bdi{color:var(--teal)}.entry-row.down>bdi{color:var(--coral)}
+.entry-cost{grid-column:1/-1;font-size:12px;color:var(--muted);text-align:center;cursor:default}
+.entry-cost bdi{font-family:"Segoe UI",Tahoma,sans-serif;font-weight:600;color:#c4d2df;direction:ltr}
+
+/* The top-right corner (0.10.0): «الشراء والبيع» and «الجرس» side by side; in a narrower window centred under the dates */
+.topright{display:flex;align-items:center;justify-content:center;gap:14px}
+.topright>.entry{flex:1 1 auto}
+/* «الجرس»: the button, its list, and the strip when one rings */
+.bell{position:relative;flex:none}
+.bell-button{position:relative;width:46px;height:46px;display:grid;place-items:center;border-radius:14px;border:1px solid var(--line2);background:rgba(12,22,34,.85);color:#c4d2df;cursor:pointer}
+.bell-button .ic{width:24px;height:24px}
+.bell-button:hover{color:var(--ink);border-color:var(--muted)}
+.bell-button[aria-expanded="true"]{color:var(--teal);border-color:var(--teal)}
+.bell-button:disabled{opacity:.6;cursor:default}
+.bell-button.ringing{color:#06101a;background:var(--gold);border-color:var(--gold);animation:bell-shake .5s ease-in-out infinite}
+@keyframes bell-shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+.bell-count{position:absolute;top:-7px;left:-7px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--teal);color:#06101a;font:700 11.5px/19px "Segoe UI",Tahoma,sans-serif}
+.bell-menu{position:absolute;top:calc(100% + 8px);right:0;width:340px;padding:10px;display:grid;gap:8px;text-align:start;background:#0b1520;border:1px solid var(--line2);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.55);z-index:20}
+.bell-head{display:flex;align-items:center;justify-content:space-between;font-size:15px}
+.bell-head button{background:transparent;border:0;color:var(--muted);font-size:20px;line-height:1;cursor:pointer}
+.bell-now{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bell-add{display:flex;gap:6px;align-items:center}
+.bell-kind{display:flex;gap:3px}
+.bell-kind button{width:30px;padding:4px 0;background:#0a131e;color:#c4d2df;border:1px solid var(--line2);border-radius:8px;font:700 13px "Segoe UI",Tahoma,sans-serif;cursor:pointer}
+.bell-kind button.on{color:#06101a;background:var(--teal);border-color:var(--teal)}
+.bell-add input{flex:1;min-width:0;background:#0a131e;color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:5px 8px;font:600 14px "Segoe UI",Tahoma,sans-serif;direction:ltr;text-align:center}
+.bell-add input:focus{outline:2px solid var(--teal);outline-offset:1px}
+.bell-add-btn{padding:5px 12px;background:var(--teal);color:#06101a;border:0;border-radius:8px;font:700 13px "Segoe UI",Tahoma,sans-serif;cursor:pointer}
+.bell-hint{font-size:12px;color:var(--gold)}
+.bell-list{display:grid;gap:4px;max-height:260px;overflow:auto}
+.bell-empty{font-size:12.5px;color:var(--muted);text-align:center;padding:6px 0}
+.bell-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:8px;align-items:center;padding:5px 8px;background:var(--card2);border:1px solid var(--line);border-radius:9px}
+.bell-row.rang{border-color:rgba(244,196,80,.6)}
+.bell-k{min-width:20px;text-align:center;font:700 12px/18px Consolas,monospace;color:var(--muted);border:1px solid var(--line2);border-radius:6px}
+.bell-v{font:700 15px "Segoe UI",Tahoma,sans-serif;font-variant-numeric:tabular-nums;direction:ltr}
+.bell-s{font-size:12px;color:var(--muted)}
+.bell-row.rang .bell-s{color:var(--gold)}
+.bell-s.warn{color:var(--gold)}
+.bell-again,.bell-del{background:transparent;border:1px solid var(--line2);border-radius:7px;color:#c4d2df;width:26px;height:24px;line-height:1;cursor:pointer}
+.bell-again:hover,.bell-del:hover{color:var(--ink);border-color:var(--muted)}
+/* 0.10.1: the six sounds and the strength */
+.bell-sounds{display:grid;gap:6px;padding-top:6px;border-top:1px solid var(--line)}
+.bell-sounds-head{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#c4d2df}
+.bell-vol{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.bell-vol input{width:120px;accent-color:var(--teal)}
+.bell-sound-list{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.bell-sound-pick{padding:5px 4px;background:#0a131e;color:#c4d2df;border:1px solid var(--line2);border-radius:8px;font:600 12.5px "Segoe UI",Tahoma,sans-serif;cursor:pointer;white-space:nowrap}
+.bell-sound-pick:hover{color:var(--ink);border-color:var(--muted)}
+.bell-sound-pick.on{color:#06101a;background:var(--teal);border-color:var(--teal)}
+.bell-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bell-foot button{background:transparent;border:1px solid var(--line2);border-radius:8px;color:#c4d2df;padding:3px 10px;font-size:12.5px;cursor:pointer}
+.bell-sound{font-size:12px;color:var(--teal)}.bell-sound.off{color:var(--gold)}
+.bell-toast{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:14px;padding:8px 14px;background:#2a2107;border:1px solid var(--gold);border-radius:12px;color:var(--ink);font-size:15px;font-weight:600;box-shadow:0 10px 28px rgba(0,0,0,.6);max-width:calc(100% - 32px)}
+.bell-toast button{background:var(--gold);color:#06101a;border:0;border-radius:8px;padding:4px 14px;font:700 14px "Segoe UI",Tahoma,sans-serif;cursor:pointer}
+
+/* «بطاقة 2» (right) and «بطاقة 1» (left), side by side; each card as wide as its tiles */
+.cards{display:flex;gap:16px;align-items:stretch}
+.cards:not(:has(.info-card:not([hidden]))){display:none}
+.info-card{position:relative;display:flex;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:16px;background:rgba(12,22,34,.85)}
+.info-card.four{flex:4 1 0}.info-card.three{flex:3 1 0}
+.card-no{position:absolute;top:-9px;right:16px;min-width:20px;padding:0 6px;font:700 11px/16px Consolas,"Courier New",monospace;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:9px}
+.tile{flex:1 1 0;background:var(--card2);border:1px solid var(--line2);border-radius:12px;padding:5px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;cursor:default}
+.tile-label{display:flex;align-items:center;gap:6px;font-size:13.5px;color:#c4d2df}
+.tile>bdi{font-size:23px;font-weight:700;color:var(--ink);line-height:1.2}
+.tile.hi>bdi{color:var(--teal)}.tile.lo>bdi{color:var(--coral)}
+.tile small{line-height:1.1}.tile small bdi{font-family:"Segoe UI",Tahoma,sans-serif;font-size:11px;color:var(--muted);direction:ltr}
+/* Notes, each on its own line; information calm, errors gold; dates as left-to-right runs */
+.start-note{max-width:1100px;display:grid;gap:2px;font-size:12.5px;line-height:1.5}
+.note.info{color:var(--muted)}.note.error{color:var(--gold)}
+.note bdi{font-family:Consolas,"Courier New",monospace;direction:ltr;unicode-bidi:isolate}
+
+/* «لوحة الرسم»: always shown; the chart fills the height that is left */
+.panel{flex:1 1 auto;display:flex;flex-direction:column;min-height:190px;padding:6px 14px 4px;border:1px solid var(--line);border-radius:16px;background:rgba(12,22,34,.85);text-align:start}
+.panel-top{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.weights{display:flex;gap:14px;align-items:center;font-size:13.5px;color:#c4d2df;justify-self:start}
+.weights label{display:flex;gap:8px;align-items:center}
+.weights input{width:72px;background:#0a131e;color:var(--ink);border:1px solid var(--line2);border-radius:9px;padding:4px 8px;font-family:"Segoe UI",Tahoma,sans-serif;font-weight:600;font-size:14px;text-align:center;direction:ltr;color-scheme:dark}
+.period{display:flex;align-items:center;gap:8px;font-size:13px;color:#c4d2df;justify-self:center;white-space:nowrap}
+.period bdi{font-family:"Segoe UI",Tahoma,sans-serif;direction:ltr}
+.legend{display:flex;gap:8px;justify-self:end}
+/* 0.9.4: the «1»/«2» choice (since 0.9.6 both draw the three lines, so the line buttons stay) */
+.kind-pick{display:flex;align-items:center;gap:4px}
+.kind-pick span{margin-inline-end:4px}
+.kind-pick button{min-width:32px;padding:3px 0;background:#0a131e;color:#c4d2df;border:1px solid var(--line2);border-radius:8px;font:700 14px "Segoe UI",Tahoma,sans-serif;cursor:pointer}
+.kind-pick button.on{color:#06101a;background:var(--teal);border-color:var(--teal)}
+.legend button{background:rgba(10,19,30,.9);border:1px solid var(--line2);border-radius:999px;padding:3px 12px;font-size:13px;cursor:pointer;color:var(--ink);display:flex;align-items:center;gap:7px}
+.legend button::after{content:"";display:inline-block;width:18px;height:4px;border-radius:2px}
+.legend .l-spread::after{background:var(--teal)}.legend .l-nas::after{background:var(--coral)}.legend .l-dow::after{background:var(--green)}
+.legend button.off{opacity:.4;text-decoration:line-through}
+.chart-wrap{position:relative;flex:1 1 auto;min-height:130px;margin-top:2px}
+#chart{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;direction:ltr}
+#chart .grid{stroke:#1a2a3a;stroke-width:1}
+#chart .zero{stroke:#4a6078;stroke-width:1.2;stroke-dasharray:6 5}
+#chart .axis{fill:#c4d2df;font-size:13px;font-family:"Segoe UI",Tahoma,sans-serif}
+#chart .axis.day{fill:#9fb1c2;font-size:12.5px}
+#chart .cross{stroke:#a3b4c8;stroke-width:1;stroke-dasharray:3 3}
+/* 0.9.3: the live price tags at the end of the Nasdaq and Dow lines */
+#chart .tag text{fill:#06101a;font-size:12px;font-weight:700;font-family:"Segoe UI",Tahoma,sans-serif;font-variant-numeric:tabular-nums}
+/* 0.9.5: «2» with its levels: the spread now (filled teal, dotted price line), highest and lowest (outlined), the start (grey) */
+#chart .lvl{stroke-width:1;stroke-dasharray:2 4}
+#chart .lvl.now{stroke:var(--teal);opacity:.9}
+#chart .lvl.hi{stroke:var(--teal);opacity:.45;stroke-dasharray:8 5}
+#chart .lvl.lo{stroke:var(--coral);opacity:.55;stroke-dasharray:8 5}
+#chart .tag.now rect{fill:var(--teal)}
+#chart .tag.hi rect,#chart .tag.lo rect,#chart .tag.start rect{fill:#0a131e;stroke-width:1.2}
+#chart .tag.hi rect{stroke:var(--teal)}#chart .tag.hi text{fill:var(--teal)}
+#chart .tag.lo rect{stroke:var(--coral)}#chart .tag.lo text{fill:var(--coral)}
+#chart .tag.start rect{stroke:#7d8fa2}#chart .tag.start text{fill:#c4d2df}
+.chart-tip{position:absolute;top:8px;background:#0a131e;border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font-size:12px;pointer-events:none;min-width:140px}
+.tip-time{color:var(--muted);font-family:Consolas,monospace;margin-bottom:2px;direction:ltr;text-align:end}
+.tip-row{display:flex;justify-content:space-between;gap:12px;color:var(--muted)}
+.tip-row bdi{font-family:Consolas,monospace;direction:ltr}
+.panel-note{margin-top:4px;font-size:12.5px}
+
+/* «أرقام الفترة»: two tiles since 0.8.2 (the range and the share above zero), each with its icon in a square */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.stats:empty{display:none}
+.stat{display:flex;align-items:center;gap:12px;padding:4px 16px;background:rgba(12,22,34,.85);border:1px solid var(--line);border-radius:12px;text-align:center}
+.stat-text{flex:1;display:flex;flex-direction:column;align-items:center}
+.stat-label{font-size:13px;color:#c4d2df}
+.stat bdi{font-size:21px;font-weight:700;line-height:1.25}
+.stat-icon{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:9px;border:1px solid var(--line2);background:#13202e}
+.stat-icon .ic{width:20px;height:20px}
+.stat-icon.teal{color:var(--teal);background:rgba(22,226,204,.1);border-color:rgba(22,226,204,.35)}
+.stat-icon.green{color:var(--green);background:rgba(60,207,122,.1);border-color:rgba(60,207,122,.35)}
+.stat-icon.muted{color:#c4d2df}
+
+/* «بطاقات الجلسات» */
+.sessions-box{padding:8px 14px;border:1px solid var(--line);border-radius:16px;background:rgba(12,22,34,.85);text-align:start}
+.sessions{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.session{background:var(--card2);border:1px solid var(--line2);border-radius:12px;padding:5px 14px;display:flex;flex-direction:column;gap:0}
+.session.now{border-color:rgba(60,207,122,.85);box-shadow:0 0 16px -6px rgba(60,207,122,.8);background:linear-gradient(180deg,rgba(60,207,122,.07),transparent),var(--card2)}
+.session-head{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--ink)}
+.sdot{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
+.session-head .hours{font-family:"Segoe UI",Tahoma,sans-serif;font-weight:400;font-size:12.5px;color:#c4d2df;direction:ltr}
+.now-badge{margin-inline-start:auto;font-size:12px;font-weight:600;color:var(--green);border:1px solid rgba(60,207,122,.7);border-radius:999px;padding:0 10px}
+.session-sum{display:block;text-align:center;font-size:22px;font-weight:800;line-height:1.25}
+.session-sum.up{color:var(--green)}.session-sum.down{color:var(--coral)}
+/* 0.9.1: the highest, lowest and mean of the spread «1» in the session's hours, three cells in one line */
+.session-meta{display:flex;justify-content:space-around;gap:6px;font-size:12px;color:var(--muted);cursor:default}
+.meta-cell{white-space:nowrap}
+.session-meta bdi{direction:ltr;font-weight:700;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+.session-meta bdi.hi{color:var(--teal)}.session-meta bdi.lo{color:var(--coral)}
+
+/* «إشارة الجسر»: beside the symbols at the top since 0.8.3 */
+.state{display:inline-flex;align-items:center;gap:7px;width:auto!important;padding:0 11px;line-height:20px;border:1px solid var(--line2);border-radius:999px;font-size:13px;color:#c4d2df;background:rgba(12,22,34,.85);font-family:Consolas,"Segoe UI",sans-serif;cursor:default}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.state.live .dot{background:var(--teal);box-shadow:0 0 8px var(--teal)}.state.quiet .dot{background:var(--gold)}.state.stale .dot,.state.waiting .dot,.state.down .dot{background:var(--coral)}
+
+/* 0.8.4 and 0.8.5 (the user's red arrows): on a wide screen the signal with the symbols, and under it the two dates, sit in the
+   top-left corner beside the number's frame, out of the flow, so they take no rows (the chart gets the height); the frame narrows
+   to leave them room. Narrower than 1300 they go back above and under the number, centred, so nothing touches. */
+@media(min-width:1300px){
+  .card>.head{position:absolute;top:10px;left:22px;width:auto;z-index:1}
+  .card>.start{position:absolute;top:40px;left:22px;width:auto;max-width:none;padding:4px 8px;z-index:1}
+  .card>.hero{max-width:min(820px,calc(100% - 800px))}
+  .card>.topright{position:absolute;top:10px;right:22px;width:auto;z-index:3}
+  .topright>.entry{grid-template-columns:1fr;max-width:none;padding:5px 12px}
+  .start .dates{grid-template-columns:1fr;gap:4px}
+  .start .date-field{justify-content:flex-start;gap:8px}
+  .start .date-field+.date-field{border-inline-start:0}
+  .start-label{display:inline-block;width:112px;font-size:13px;text-align:start}
+  .start-label small{display:none}
+  .start input{width:190px;padding:3px 8px;font-size:13px}
+  .start button{padding:2px 7px;font-size:14px}
+}
+/* Narrower than 1300 the bell sits at the left end of its row, so its list opens to the right (0.10.0) */
+@media(max-width:1299px){.bell-menu{right:auto;left:0}}
+/* A narrow window: the parts one under the other, the page scrolls, the chart at a fixed height. */
+@media(max-width:899px){
+  .card{padding:8px 12px}
+  .dates{grid-template-columns:1fr}
+  .date-field{justify-content:space-between}
+  .date-field+.date-field{border-inline-start:0;border-top:1px solid var(--line);padding-top:8px}
+  .cards{flex-direction:column}
+  .info-card{flex-wrap:wrap}
+  .tile{flex:1 1 104px}
+  .tile>bdi{font-size:20px}
+  .panel-top{grid-template-columns:1fr;justify-items:center}
+  .weights,.legend,.period{justify-self:center}
+  .period{white-space:normal}
+  .chart-wrap{flex:none;height:230px}
+  .stats,.sessions{grid-template-columns:repeat(2,1fr);gap:8px}
+}
+
+/* A phone (0.11.0, the phone link): nothing wider than the screen. «الشراء والبيع» one row under the other without the legs text (it's in
+   each row's tooltip), dates under their labels, one session per row. */
+@media(max-width:519px){
+  .card{padding:6px 8px}
+  .topright{gap:8px;align-items:stretch}
+  .topright>.entry{grid-template-columns:1fr;min-width:0;padding:5px 10px}
+  .entry-legs{display:none}
+  .entry-row{grid-template-columns:auto 1fr;gap:6px}
+  .entry-row>bdi{text-align:end;font-size:18px}
+  .bell-button{height:100%;min-height:46px}
+  .bell-menu{width:min(340px,calc(100vw - 16px))}
+  .date-field{flex-wrap:wrap;gap:4px 8px}
+  .start-label{width:100%;text-align:start}
+  .start .start-row{flex:1}
+  .start input{width:auto;flex:1}
+  .info-card{padding:8px 6px;gap:6px}
+  .tile{flex:1 1 140px}
+  .weights{gap:8px;flex-wrap:wrap;justify-content:center}
+  .weights input{width:56px}
+  .sessions{grid-template-columns:1fr}
+  .bell-toast{font-size:13px;gap:8px}
+}

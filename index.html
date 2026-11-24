@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الفرق · تجريبي</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- The icons, drawn once and used by name (<use href="#i-…">). Lines in the current colour. -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" class="solid"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 21V4M6 4h11l-2.5 4.5L17 13H6"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M14.5 7H21v6.5"/></symbol>
+  <symbol id="i-fall" viewBox="0 0 24 24"><path d="M3 7l6 6 4-4 8 8M14.5 17H21v-6.5"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 12.5l9 5 9-5M3 16.5l9 5 9-5"/></symbol>
+  <symbol id="i-range" viewBox="0 0 24 24"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></symbol>
+  <symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v16M3.5 9h5M9.5 15h5M15.5 7h5"/></symbol>
+</svg>
+
+<main class="card" aria-live="polite">
+  <!-- The two symbols and the bridge signal (0.8.1: the title line «الفرق ⇄» was removed at the user's request) -->
+  <header class="head">
+    <div id="pair" class="pair"><bdi>NAS100</bdi> − <bdi>US30</bdi></div>
+    <!-- «إشارة الجسر», moved up beside the symbols in 0.8.3 («هذا تحويل») -->
+    <div id="state" class="state waiting"><span class="dot"></span><span id="stateText">بانتظار MT5</span></div>
+  </header>
+
+  <!-- «الرقم الكبير» in its frame; «منذ البداية» (or «الفرق») on its top edge -->
+  <div class="hero">
+    <div id="mainLabel" class="label">الفرق</div>
+    <div id="spread" class="spread"><bdi>—</bdi></div>
+  </div>
+
+  <!-- «التاريخان»: one bar, the start on the right, «from» for highest/lowest on the left -->
+  <section class="start" aria-label="التاريخان">
+    <div class="dates">
+      <div class="date-field">
+        <label class="start-label" for="startInput" title="بساعة MT5">البداية <small>بساعة MT5</small></label>
+        <div class="start-row">
+          <input id="startInput" type="datetime-local" step="60">
+          <button id="startClear" type="button" title="مسح" aria-label="مسح البداية" hidden>×</button>
+        </div>
+      </div>
+      <div class="date-field">
+        <label class="start-label" for="rangeInput" title="بساعة MT5">الأعلى والأدنى من <small>بساعة MT5</small></label>
+        <div class="start-row">
+          <input id="rangeInput" type="datetime-local" step="60">
+          <button id="rangeClear" type="button" title="مسح" aria-label="مسح تاريخ الأعلى والأدنى" hidden>×</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The top-right corner: «الشراء والبيع» and, to its left, «الجرس» -->
+  <div class="topright">
+  <!-- «الشراء والبيع» (ARCHITECTURE.md 20): the entry spread now for each kind; display only, no trading (decision 14) -->
+  <section id="entry" class="entry" aria-label="الشراء والبيع">
+    <div class="entry-row up" title="زيادة: شراء ناسداك بسعر الشراء (Ask) وبيع داو بسعر البيع (Bid). يربح إن زاد الفرق">
+      <span class="entry-name"><svg class="ic teal" aria-hidden="true"><use href="#i-up"/></svg>زيادة</span>
+      <span class="entry-legs">شراء ناسداك · بيع داو</span>
+      <bdi id="entryUp">—</bdi>
+    </div>
+    <div class="entry-row down" title="نقصان: بيع ناسداك بسعر البيع (Bid) وشراء داو بسعر الشراء (Ask). يربح إن نقص الفرق">
+      <span class="entry-name"><svg class="ic coral" aria-hidden="true"><use href="#i-down"/></svg>نقصان</span>
+      <span class="entry-legs">بيع ناسداك · شراء داو</span>
+      <bdi id="entryDown">—</bdi>
+    </div>
+    <div class="entry-cost" title="زيادة − نقصان = سبريد ناسداك + سبريد داو">السبريد <bdi id="entryCost">—</bdi></div>
+  </section>
+  <!-- «الجرس» (ARCHITECTURE.md 21): the button opens the list of bells on the spread «1» or «2» -->
+  <div id="bell" class="bell">
+    <button id="bellButton" class="bell-button" type="button" aria-expanded="false" aria-controls="bellMenu" title="الجرس">
+      <svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg><span id="bellCount" class="bell-count" hidden>0</span>
+    </button>
+    <div id="bellMenu" class="bell-menu" role="dialog" aria-label="الجرس" hidden>
+      <div class="bell-head"><b>الجرس</b><button id="bellClose" type="button" aria-label="إغلاق">×</button></div>
+      <div id="bellNow" class="bell-now"></div>
+      <div class="bell-add">
+        <div id="bellKind" class="bell-kind" role="group" aria-label="نوع الفرق">
+          <button type="button" data-kind="1" class="on" title="«1»: من الصفر عند البداية">1</button>
+          <button type="button" data-kind="2" title="«2»: الفرق كما هو">2</button>
+        </div>
+        <input id="bellLevel" type="text" inputmode="decimal" placeholder="−600 أو 700" aria-label="رقم الجرس">
+        <button id="bellAdd" type="button" class="bell-add-btn">إضافة</button>
+      </div>
+      <div id="bellHint" class="bell-hint" hidden></div>
+      <div id="bellList" class="bell-list"></div>
+      <!-- 0.10.1: the sound, six to choose from (choosing one plays it), and its strength -->
+      <div class="bell-sounds">
+        <div class="bell-sounds-head"><span>الصوت</span><label class="bell-vol">القوة <input id="bellVolume" type="range" min="10" max="100" step="5" value="100"></label></div>
+        <div id="bellSoundList" class="bell-sound-list"></div>
+      </div>
+      <div class="bell-foot"><button id="bellTest" type="button">تجربة الصوت</button><span id="bellSound" class="bell-sound"></span></div>
+    </div>
+  </div>
+  </div>
+  <!-- The strip that shows when a bell rings; «حسناً» stops the sound -->
+  <div id="bellToast" class="bell-toast" role="alert" hidden><span id="bellToastText"></span><button id="bellOk" type="button">حسناً</button></div>
+
+  <!-- The two cards side by side (ARCHITECTURE.md 2.1, 18, 19): «بطاقة 2» on the right, «بطاقة 1» on the left -->
+  <div class="cards">
+    <section id="startInfo" class="info-card four" aria-label="بطاقة 2" hidden>
+      <span class="card-no" aria-hidden="true">2</span>
+      <div class="tile"><span class="tile-label"><svg class="ic teal" aria-hidden="true"><use href="#i-target"/></svg>الفرق الآن</span><bdi id="nowSpread">—</bdi></div>
+      <div id="startRow" class="tile"><span class="tile-label"><svg class="ic blue" aria-hidden="true"><use href="#i-flag"/></svg>الفرق عند البداية</span><bdi id="startSpread">—</bdi><small><bdi id="startAt"></bdi></small></div>
+      <div id="maxRow" class="tile hi"><span class="tile-label"><svg class="ic teal" aria-hidden="true"><use href="#i-up"/></svg>الأعلى</span><bdi id="maxSince">—</bdi></div>
+      <div id="minRow" class="tile lo"><span class="tile-label"><svg class="ic coral" aria-hidden="true"><use href="#i-down"/></svg>الأدنى</span><bdi id="minSince">—</bdi></div>
+    </section>
+    <section id="card1" class="info-card three" aria-label="بطاقة 1" hidden>
+      <span class="card-no" aria-hidden="true">1</span>
+      <div id="max1Row" class="tile hi"><span class="tile-label"><svg class="ic teal" aria-hidden="true"><use href="#i-trend"/></svg>الأعلى</span><bdi id="max1">—</bdi></div>
+      <div id="min1Row" class="tile lo"><span class="tile-label"><svg class="ic coral" aria-hidden="true"><use href="#i-down"/></svg>الأدنى</span><bdi id="min1">—</bdi></div>
+      <div id="mean1Row" class="tile"><span class="tile-label"><svg class="ic muted" aria-hidden="true"><use href="#i-layers"/></svg>المتوسط</span><bdi id="mean1">—</bdi></div>
+    </section>
+  </div>
+  <div id="startNote" class="start-note" hidden></div>
+
+  <!-- «لوحة الرسم», always shown (decision 13): weights on the right, the period in the middle, the line buttons on the left -->
+  <section id="panel" class="panel" aria-label="لوحة الرسم">
+    <div class="panel-top">
+      <div class="weights">
+        <!-- 0.9.4: the chart draws the spread «1» (from zero at the start) or «2» (as it is) -->
+        <div id="kindPick" class="kind-pick" role="group" aria-label="نوع الفرق في الرسم">
+          <span>الفرق</span>
+          <button type="button" data-kind="1" title="«1»: من الصفر عند البداية، مع ناسداك وداو">1</button>
+          <button type="button" data-kind="2" title="«2»: الفرق كما هو، بأرقامه الحقيقية">2</button>
+        </div>
+        <label title="الأوزان للرسم فقط (القرار 12)">وزن ناسداك <input id="wA" type="number" step="0.01" min="0" value="1"></label>
+        <label title="الأوزان للرسم فقط (القرار 12)">وزن داو <input id="wB" type="number" step="0.01" min="0" value="1"></label>
+      </div>
+      <div class="period"><svg class="ic muted" aria-hidden="true"><use href="#i-sliders"/></svg><span id="period"></span></div>
+      <div id="legend" class="legend">
+        <button type="button" data-line="spread" class="l-spread">الفرق</button>
+        <button type="button" data-line="nas" class="l-nas">ناسداك</button>
+        <button type="button" data-line="dow" class="l-dow">داو</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <svg id="chart" role="img" aria-label="الفرق وناسداك وداو منذ أول الفترة"></svg>
+      <div id="chartTip" class="chart-tip" hidden></div>
+    </div>
+    <div id="panelNote" class="note error panel-note" hidden></div>
+  </section>
+
+  <!-- «أرقام الفترة» -->
+  <div id="stats" class="stats"></div>
+
+  <!-- «بطاقات الجلسات» (0.9.1: no title line, the user deleted it; the hours are MT5's clock) -->
+  <section class="sessions-box" aria-label="بطاقات الجلسات">
+    <div id="sessions" class="sessions"></div>
+  </section>
+
+</main>
+<script type="module" src="demo-backend.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
